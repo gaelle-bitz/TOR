@@ -7,5 +7,11 @@
 
 void MacReceiver(void *argument)
 {
-	// TODO
+	/*
+	*Wait on flag "From_Phy"
+	*Check MacRQueue
+	*Full ReadQueue + do stuff depending on messageType
+	*reset flag "From_Phy"
+	*dodo
+	*/
 }
