@@ -18,22 +18,35 @@ void MacSender(void *argument)
 	*/
 
 	//generate token
-	struct queueMsg_t* tmp;
-	osMessageQueueGet(queue_macS_id,tmp,NULL, osWaitForever );
-	
-	switch (tmp->type)
-	{
-		case NEW_TOKEN:
-				memPool[0]=255<<16&
-		
-	
-			break;
-		
-		case TOKEN:
-			break;
-		
-		default:
-			break;
+	osStatus_t sendStatus;
+	struct queueMsg_t tmp;
+	uint8_t *newTokenMem;
+	struct queueMsg_t toSend;
+	for(;;){
+		osMessageQueueGet(queue_macS_id,&tmp,NULL, osWaitForever );
+		switch (tmp.type)
+		{
+			case NEW_TOKEN:
+				newTokenMem = osMemoryPoolAlloc(memPool,osWaitForever);
+				for(uint32_t i = 0; i < 16; i++){
+					newTokenMem[i]=0;
+				}
+				newTokenMem[0]=0xFF;
+				newTokenMem[MYADDRESS]=2;
+				toSend.type = TO_PHY;
+				toSend.anyPtr = newTokenMem;
+				toSend.addr = NULL;
+				toSend.sapi = NULL;
+				sendStatus = osMessageQueuePut(queue_phyS_id, &toSend, osPriorityNormal, osWaitForever);
+				break;
+			
+			case TOKEN:
+				break;
+			
+			default:
+				break;
+		}
+		printf("Our case : %d\n", newTokenMem[MYADDRESS]);
+		printf("Send status : %d\n", sendStatus);
 	}
-	
 }
