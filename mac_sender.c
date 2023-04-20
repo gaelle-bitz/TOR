@@ -16,6 +16,13 @@ void MacSender(void *argument)
 	*~eventually resend same
 	*send token
 	*/
+	
+	osMessageQueueId_t  queue_internMacS_id;
+	const osMessageQueueAttr_t queue_internMacS_attr = {
+		.name = "MAC_INTERN_QUEUE"  	
+	};
+
+	queue_internMacS_id = osMessageQueueNew(2,sizeof(struct queueMsg_t),&queue_internMacS_attr); 	
 
 	//generate token
 	osStatus_t sendStatus;
@@ -32,7 +39,7 @@ void MacSender(void *argument)
 					newTokenMem[i]=0;
 				}
 				newTokenMem[0]=0xFF;
-				newTokenMem[MYADDRESS]=2;
+				newTokenMem[MYADDRESS-1]=2;
 				toSend.type = TO_PHY;
 				toSend.anyPtr = newTokenMem;
 				toSend.addr = NULL;
@@ -41,9 +48,19 @@ void MacSender(void *argument)
 				break;
 			
 			case TOKEN:
+				//destack our queue + do stuff with it
 				break;
 			
-			default:
+			case DATABACK:
+				//Checkre Read & ack
+				break;
+			
+			case DATA_IND:
+				break;
+			
+			
+			default :
+				//put msg in our queue
 				break;
 		}
 		printf("Our case : %d\n", newTokenMem[MYADDRESS]);
